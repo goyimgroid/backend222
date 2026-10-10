@@ -1,8 +1,19 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request, Response
 
 from api.v1 import users_router, tasks_router
+from core.database import Base, engine
+import models
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(engine)
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 app.include_router(tasks_router)
 app.include_router(users_router)
 
@@ -20,4 +31,3 @@ async def debug(request: Request):
     ip = request.client.host
 
     return {"ip": ip, "body": body, "query_params": query_params, "headers": headers, "json_data": json_data}
-

@@ -1,8 +1,10 @@
-from schemas.tasks import TaskIn
+from schemas.tasks import TaskIn, TaskOut, TaskUpdate
 from schemas.users import CreateUserRequest, UserResponse
 
 __all__ = [
-    TaskIn,
-    CreateUserRequest,
-    UserResponse
+    "TaskIn",
+    "TaskOut",
+    "TaskUpdate",
+    "CreateUserRequest",
+    "UserResponse",
 ]

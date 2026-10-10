@@ -1,23 +1,31 @@
-from fastapi import APIRouter
-from schemas import TaskIn
+from fastapi import APIRouter, Depends
+
+from schemas import TaskIn, TaskOut, TaskUpdate
+from services.tasks import TaskService
 
 router = APIRouter(tags=["tasks"])
-tasks = []
 
 
-@router.get("/tasks", status_code=200)
-def get_tasks():
-    return tasks
+@router.post("/tasks", status_code=201, response_model=TaskOut)
+def create_task(task: TaskIn, service: TaskService = Depends()):
+    return service.create_task(task)
 
 
-@router.post("/tasks", status_code=201)
-def post_tasks(task: TaskIn) -> dict:
-    task = {
-        "id": len(tasks) + 1,
-        "title": task.title,
-        "priority": task.priority,
-    }
-    tasks.append(task)
+@router.get("/tasks", status_code=200, response_model=list[TaskOut])
+def get_tasks(service: TaskService = Depends()):
+    return service.get_tasks()
 
-    return task
 
+@router.get("/tasks/{task_id}", status_code=200, response_model=TaskOut)
+def get_task(task_id: int, service: TaskService = Depends()):
+    return service.get_task(task_id)
+
+
+@router.patch("/tasks/{task_id}", status_code=200, response_model=TaskOut)
+def update_task(task_id: int, data: TaskUpdate, service: TaskService = Depends()):
+    return service.update_task(task_id, data)
+
+
+@router.delete("/tasks/{task_id}", status_code=204)
+def delete_task(task_id: int, service: TaskService = Depends()):
+    service.delete_task(task_id)
